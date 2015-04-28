@@ -1,4 +1,4 @@
-package dataoperate;
+package com.hzmc.dataoperate;
 
 public interface ExcuteSql
 {

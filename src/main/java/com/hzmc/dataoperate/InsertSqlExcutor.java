@@ -1,4 +1,4 @@
-package dataoperate;
+package com.hzmc.dataoperate;
 
 import java.sql.SQLException;
 import java.sql.Statement;
