@@ -15,7 +15,7 @@ import com.hzmc.dataoperate.UpdateSqlExcutor;
 
 public class UserDaoImpl implements UserDao
 {
-	private static int i = 0;
+	private static int userId = 0;
 
 	public User addUser(User user) 
 	{
@@ -23,8 +23,8 @@ public class UserDaoImpl implements UserDao
 		String sqltext = new String();
 		/*设置标示位和ID*/
 		user.setIslive(1);
-		user.setId(i);
-		i++;
+		user.setId(userId);
+		userId++;
 		sqltext = "insert into persons (id,islive,username, password)" + "values (" + user.getId() + "," + user.getIslive() + ",'" +  user.getUsername() + "','" + user.getPassword() + "')";
 		System.out.println(sqltext);
 		ExcuteSql sql = new InsertSqlExcutor();	
