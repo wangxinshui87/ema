@@ -29,26 +29,24 @@ public class NormalLogin
 			System.out.println(user1.getUsername() + ":" + user1.getPassword());
 		}
 	}
+	
+	/*增加用户*/
 	public void addUser()
 	{
 		User user = new User();
-		user.setUsername("zs");
+		user.setUsername("ls");
 		user.setPassword("123456");
 		user = userService.addUser(user);
 		System.out.println(user.getUsername() + ":" + user.getPassword() + ":" + user.getId() + ":" + user.getIslive());
 		
-	}
-	public void Update()
-	{
-		//每隔一段时间更新一次容器
-		//或者把这个函数注册到维护的类中
 	}
 	/*构造函数*/
 	public NormalLogin()
 	{
 		// TODO Auto-generated constructor stub
 	}
-	/*判断登陆是否合法*/
+	
+	/*登陆用户,判断登陆是否合法*/
 	public Boolean IsLegal(String username, String password)
 	{
 		// TODO 
@@ -64,15 +62,36 @@ public class NormalLogin
 		else
 		{
 			System.out.println("登陆失败  : " + result.get("errorMsg").toString());
+			return false;
 		}
 		
+		return true;
+	}
+	
+	public Boolean deleteUser(String username, String password)
+	{
+		/*只有用户名密码都正确的时候才能删除用户,删除用户就是把用户的ISLIVE 字段设置为0*/
+		User user = new User();
+		user.setUsername(username);
+		user.setPassword(password);
+		Map<String, Object>result;
+		result = userService.deleteUser(user);
+		if (result.get("isSuccess").equals(true))
+		{
+			System.out.println("删除成功");
+		}
+		else
+		{
+			System.out.println("删除失败" + result.get("errorMsg").toString());
+		}
 		return true;
 	}
 	
 	public static void main(String[] args)
 	{
 		NormalLogin login = new NormalLogin();
-		//login.addUser();
-		login.IsLegal("zs", "123456");
+	//	login.addUser();
+	//	login.IsLegal("zs", "123456");
+		login.deleteUser("zs", "123456");
 	}
 }

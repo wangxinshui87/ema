@@ -19,27 +19,38 @@ public class UserDaoImpl implements UserDao
 
 	public User addUser(User user) 
 	{
-		// TODO Auto-generated method stub
-		String sqltext = new String();
-		/*设置标示位和ID*/
-		user.setIslive(1);
-		user.setId(userId);
-		userId++;
-		sqltext = "insert into persons (id,islive,username, password)" + "values (" + user.getId() + "," + user.getIslive() + ",'" +  user.getUsername() + "','" + user.getPassword() + "')";
-		System.out.println(sqltext);
-		ExcuteSql sql = new InsertSqlExcutor();	
-		sql.templateMethod(sqltext);
+		try
+		{
+			String sqltext = new String();
+			/*设置标示位*/
+			user.setIslive(1);
+			/*设置userID*/
+			sqltext = "select count(*) from persons";
+			ExcuteSql sqlSelect = new SelectSqlExcutor();
+			ResultSet rs = (ResultSet) sqlSelect.templateMethod(sqltext);
+			rs.next();
+			user.setId(rs.getInt(1));
+		//	System.out.println("after select count" + sqltext);
+			sqltext = "insert into persons (id,islive,username, password)" + "values (" + user.getId() + "," + user.getIslive() + ",'" +  user.getUsername() + "','" + user.getPassword() + "')";
+			
+			ExcuteSql sql = new InsertSqlExcutor();	
+			sql.templateMethod(sqltext);
+		}
+		catch(Exception e)
+		{
+			System.out.println("user: adduser" + e.getMessage());
+		}
 		return user;
-	//	return Integer.parseInt(sql.templateMethod(sqltext).toString());
 	}
 
 	public int deleteUser(User user)
 	{
-		// TODO Auto-generated method stub
-		String sqltext = new String();
-		sqltext = "delete from persons where isLive = " + user.getIslive();
-		ExcuteSql sql = new DeleteSqlExcutor();
-		return Integer.parseInt(sql.templateMethod(sqltext).toString());
+		return updateUser(user);
+//		// TODO Auto-generated method stub
+//		String sqltext = new String();
+//		sqltext = "delete from persons where isLive = " + user.getIslive();
+//		ExcuteSql sql = new DeleteSqlExcutor();
+//		return Integer.parseInt(sql.templateMethod(sqltext).toString());
 	}
 
 	public int updateUser(User user)
@@ -47,7 +58,8 @@ public class UserDaoImpl implements UserDao
 		// TODO Auto-generated method stub
 		String sqltext = new String();
 		ExcuteSql sql = new UpdateSqlExcutor();
-		sqltext = "update persons where username = " + user.getUsername();
+		sqltext = "update persons set islive = 0 where username = '" + user.getUsername() +"'";
+	//	System.out.println("updateUser : " + sqltext);
 		return Integer.parseInt(sql.templateMethod(sqltext).toString());
 	}
 
