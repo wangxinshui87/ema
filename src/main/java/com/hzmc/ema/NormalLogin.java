@@ -1,9 +1,23 @@
 package com.hzmc.ema;
 
+import groovy.util.Node;
+import groovy.util.NodeBuilder;
+import static org.elasticsearch.node.NodeBuilder.*;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.client.Client;
+import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.common.xcontent.XContentFactory;
 
 import com.hzmc.dao.User;
 import com.hzmc.dao.UserDao;
@@ -87,11 +101,30 @@ public class NormalLogin
 		return true;
 	}
 	
-	public static void main(String[] args)
+	public static void main(String[] args) throws ElasticsearchException, IOException
 	{
-		NormalLogin login = new NormalLogin();
+	//	NormalLogin login = new NormalLogin();
 	//	login.addUser();
 	//	login.IsLegal("zs", "123456");
-		login.deleteUser("zs", "123456");
+	//	login.deleteUser("zs", "123456");
+		Settings settings = ImmutableSettings.settingsBuilder().put("client.transport.sniff", true).put("ema", "Buzzard").build();
+		Client client = new TransportClient(settings).addTransportAddress(new InetSocketTransportAddress("172.16.10.222", 9300));
+		
+		System.out.println(client.toString());
+//		IndexResponse response = client.prepareIndex("comment_index", "comment_ugc", "comment_123674")
+//			    .setSource( XContentFactory.jsonBuilder()
+//			    .startObject()
+//			      .field("author", "569874")
+//			      .field("author_name", "riching")
+//			      .field("mark", 232)
+//			      .field("body", "北京不错，但是人太多了")
+//			      .field("createDate", "20130801175520")
+//			      .field("valid", true)
+//			    .endObject())
+//			    .setTTL(8000)
+//			    .execute().actionGet();
+//
+//			System.out.println(response.getId());
+
 	}
 }
