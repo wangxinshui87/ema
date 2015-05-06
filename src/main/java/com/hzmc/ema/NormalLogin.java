@@ -8,13 +8,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.lucene.queryparser.flexible.core.builders.QueryBuilder;
+import org.apache.lucene.queryparser.flexible.standard.builders.TermRangeQueryNodeBuilder;
+import org.apache.lucene.search.TermQuery;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.percolate.PercolateResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.node.Node;
 
@@ -106,13 +111,10 @@ public class NormalLogin
 	//	login.addUser();
 	//	login.IsLegal("zs", "123456");
 	//	login.deleteUser("zs", "123456");
+		
 		Node node = nodeBuilder().clusterName("ema").client(true).node();
 		Client client = ((org.elasticsearch.node.Node) node).client();
-//		Settings settings = ImmutableSettings.settingsBuilder().put("client.transport.sniff", true).put("ema", "Buzzard").build();
-//		Client client = new TransportClient(settings).addTransportAddress(new InetSocketTransportAddress("172.16.10.222", 9300));
-		
-//		
-//		System.out.println(client.toString());
+		/* 建立索引
 		IndexResponse response = client.prepareIndex("comment_index", "comment_ugc", "comment_123674")
 			    .setSource( XContentFactory.jsonBuilder()
 			    .startObject()
@@ -127,6 +129,35 @@ public class NormalLogin
 			    .execute().actionGet();
 
 			System.out.println(response.getId());
-
+		 */
+		QueryBuilder qb = new TermRangeQueryNodeBuilder();
+		
+		//register it in the percolator
+//		client.prepareIndex("myindex", ".percolator", "myDesignatedQueryName")
+//	    .setSource(XContentFactory.jsonBuilder()
+//	        .startObject()
+//	            .field("query", qb) // Register the query
+//	        .endObject())
+//	    .setRefresh(true) // Needed when the query shall be available immediately
+//	    .execute().actionGet();
+		
+		//Build a document to check against the percolator
+		XContentBuilder docBuilder = XContentFactory.jsonBuilder().startObject();
+		docBuilder.field("doc").startObject(); //This is needed to designate the document
+		docBuilder.field("content", "bonsai tree");
+		docBuilder.endObject(); //End of the doc field
+		docBuilder.endObject(); //End of the JSON root object
+		//Percolate
+		PercolateResponse response = client.preparePercolate()
+		                        .setIndices("myindex")
+		                        .setDocumentType("myDocumentType")
+		                        .setSource(docBuilder).execute().actionGet();
+		//Iterate over the results
+		for(PercolateResponse.Match match : response) {
+		    //Handle the result which is the name of
+		    //the query in the percolator
+			System.out.println("has match");
+		}
 	}
+
 }
