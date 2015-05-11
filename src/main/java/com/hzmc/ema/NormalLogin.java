@@ -14,14 +14,21 @@ import org.apache.lucene.search.TermQuery;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.percolate.PercolateResponse;
+import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.common.settings.ImmutableSettings.Builder;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.node.Node;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
 
 import com.hzmc.dao.User;
 import com.hzmc.dao.UserDao;
@@ -104,6 +111,59 @@ public class NormalLogin
 		}
 		return true;
 	}
+
+	
+	
+	/*
+	
+    public static void main(String[]args)throws ElasticsearchException, IOException
+    {
+    //	Node node = nodeBuilder().clusterName("ema").client(true).node();
+	//	Client client = ((org.elasticsearch.node.Node) node).client();
+		
+    	
+    	
+    	Builder settings = ImmutableSettings.settingsBuilder()
+    			.put("cluster.name","alarm");
+    
+    	Client client = new TransportClient(settings)
+    		.addTransportAddress(new InetSocketTransportAddress("172.16.8.152", 9300));
+    	
+//    	IndexResponse response = client.prepareIndex("comment_index", "comment_ugc", "comment_123674")
+//			    .setSource( XContentFactory.jsonBuilder()
+//			    .startObject()
+//			      .field("author", "569874")
+//			      .field("author_name", "riching")
+//			      .field("mark", 232)
+//			      .field("body", "北京不错，但是人太多了")
+//			      .field("createDate", "20130801175520")
+//			      .field("valid", true)
+//			    .endObject())
+//			    .setTTL(8000)
+//			    .execute().actionGet();
+//    	System.out.println(response.getId());
+    	
+		 SearchResponse actionGet = client.prepareSearch("cpu_all_index-2015.05")
+                 .setTypes("CPU_ALL")
+                 .setQuery(QueryBuilders.boolQuery().must(QueryBuilders.termQuery("hostname", "hca1"))
+                  ).execute().actionGet();
+     SearchHits hits = actionGet.getHits();
+     List<Map<String, Object>> matchRsult = new LinkedList<Map<String, Object>>();
+     int i = 0;
+     for (SearchHit hit : hits.getHits())
+     {
+         matchRsult.add(hit.getSource());
+         System.out.println(hit.getSource());
+         Object hostname = hit.getSource().get("hostname");
+         System.out.println(hostname);
+         
+         i++;
+     }
+     System.out.println(i);
+				
+    }
+}
+*/
 	
 	public static void main(String[] args) throws ElasticsearchException, IOException
 	{
@@ -112,52 +172,62 @@ public class NormalLogin
 	//	login.IsLegal("zs", "123456");
 	//	login.deleteUser("zs", "123456");
 		
-		Node node = nodeBuilder().clusterName("ema").client(true).node();
-		Client client = ((org.elasticsearch.node.Node) node).client();
-		/* 建立索引
-		IndexResponse response = client.prepareIndex("comment_index", "comment_ugc", "comment_123674")
-			    .setSource( XContentFactory.jsonBuilder()
-			    .startObject()
-			      .field("author", "569874")
-			      .field("author_name", "riching")
-			      .field("mark", 232)
-			      .field("body", "北京不错，但是人太多了")
-			      .field("createDate", "20130801175520")
-			      .field("valid", true)
-			    .endObject())
-			    .setTTL(8000)
-			    .execute().actionGet();
-
-			System.out.println(response.getId());
-		 */
-		QueryBuilder qb = new TermRangeQueryNodeBuilder();
-		
-		//register it in the percolator
-//		client.prepareIndex("myindex", ".percolator", "myDesignatedQueryName")
+//		Node node = nodeBuilder().clusterName("ema").client(true).node();
+//		Client client = ((org.elasticsearch.node.Node) node).client();
+//		// 建立索引
+//		IndexResponse response = client.prepareIndex("comment_index", "comment_ugc", "comment_123674")
+//			    .setSource( XContentFactory.jsonBuilder()
+//			    .startObject()
+//			      .field("author", "569874")
+//			      .field("author_name", "riching")
+//			      .field("mark", 232)
+//			      .field("body", "北京不错，但是人太多了")
+//			      .field("createDate", "20130801175520")
+//			      .field("valid", true)
+//			    .endObject())
+//			    .setTTL(8000)
+//			    .execute().actionGet();
+//
+////			System.out.println(response.getId());
+////		// 
+//		QueryBuilder qb = new TermRangeQueryNodeBuilder();
+//		
+//		//register it in the percolator
+//		client.prepareIndex("zsyindex", ".percolator", "myDesignatedQueryName")
 //	    .setSource(XContentFactory.jsonBuilder()
 //	        .startObject()
 //	            .field("query", qb) // Register the query
 //	        .endObject())
 //	    .setRefresh(true) // Needed when the query shall be available immediately
 //	    .execute().actionGet();
-		
+//		
+		Builder settings = ImmutableSettings.settingsBuilder().put(
+				"cluster.name", "alarm");
+		TransportClient client = new TransportClient(settings)
+				.addTransportAddress(new InetSocketTransportAddress(
+						"172.16.8.152", 9300));
 		//Build a document to check against the percolator
 		XContentBuilder docBuilder = XContentFactory.jsonBuilder().startObject();
 		docBuilder.field("doc").startObject(); //This is needed to designate the document
-		docBuilder.field("content", "bonsai tree");
+		docBuilder.field("Used_PCT",5);
 		docBuilder.endObject(); //End of the doc field
+		
 		docBuilder.endObject(); //End of the JSON root object
 		//Percolate
 		PercolateResponse response = client.preparePercolate()
-		                        .setIndices("myindex")
-		                        .setDocumentType("myDocumentType")
+		                        .setIndices("aaindex")
+		                        .setDocumentType("mytype")
 		                        .setSource(docBuilder).execute().actionGet();
 		//Iterate over the results
 		for(PercolateResponse.Match match : response) {
 		    //Handle the result which is the name of
 		    //the query in the percolator
+			Text index = match.getIndex();
+			Text id = match.getId();
+			System.out.println(index);
+			System.out.println(id);
 			System.out.println("has match");
 		}
+		//System.out.println("not match");
 	}
-
 }
