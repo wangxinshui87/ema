@@ -172,11 +172,16 @@ public class NormalLogin
 	//	login.IsLegal("zs", "123456");
 	//	login.deleteUser("zs", "123456");
 		
-//		Node node = nodeBuilder().clusterName("ema").client(true).node();
-//		Client client = ((org.elasticsearch.node.Node) node).client();
-//		// 建立索引
-//		IndexResponse response = client.prepareIndex("comment_index", "comment_ugc", "comment_123674")
-//			    .setSource( XContentFactory.jsonBuilder()
+		Node node = nodeBuilder().clusterName("ema").client(true).node();
+		Client client = ((org.elasticsearch.node.Node) node).client();
+		// 建立索引
+		IndexResponse response = client.prepareIndex("comment_index", "comment_ugc", "comment_123674")
+			    .setSource( XContentFactory.jsonBuilder()
+			    .startArray("ID")
+			    .field("10")
+			    .field("20")
+			    .endArray())
+			    .execute().actionGet();
 //			    .startObject()
 //			      .field("author", "569874")
 //			      .field("author_name", "riching")
@@ -187,9 +192,9 @@ public class NormalLogin
 //			    .endObject())
 //			    .setTTL(8000)
 //			    .execute().actionGet();
-//
-////			System.out.println(response.getId());
-////		// 
+
+			System.out.println(response.getId());
+//		// 
 //		QueryBuilder qb = new TermRangeQueryNodeBuilder();
 //		
 //		//register it in the percolator
@@ -200,34 +205,34 @@ public class NormalLogin
 //	        .endObject())
 //	    .setRefresh(true) // Needed when the query shall be available immediately
 //	    .execute().actionGet();
+////		
+//		Builder settings = ImmutableSettings.settingsBuilder().put(
+//				"cluster.name", "alarm");
+//		TransportClient client = new TransportClient(settings)
+//				.addTransportAddress(new InetSocketTransportAddress(
+//						"172.16.8.152", 9300));
+//		//Build a document to check against the percolator
+//		XContentBuilder docBuilder = XContentFactory.jsonBuilder().startObject();
+//		docBuilder.field("doc").startObject(); //This is needed to designate the document
+//		docBuilder.field("Used_PCT",5);
+//		docBuilder.endObject(); //End of the doc field
 //		
-		Builder settings = ImmutableSettings.settingsBuilder().put(
-				"cluster.name", "alarm");
-		TransportClient client = new TransportClient(settings)
-				.addTransportAddress(new InetSocketTransportAddress(
-						"172.16.8.152", 9300));
-		//Build a document to check against the percolator
-		XContentBuilder docBuilder = XContentFactory.jsonBuilder().startObject();
-		docBuilder.field("doc").startObject(); //This is needed to designate the document
-		docBuilder.field("Used_PCT",5);
-		docBuilder.endObject(); //End of the doc field
-		
-		docBuilder.endObject(); //End of the JSON root object
-		//Percolate
-		PercolateResponse response = client.preparePercolate()
-		                        .setIndices("aaindex")
-		                        .setDocumentType("mytype")
-		                        .setSource(docBuilder).execute().actionGet();
-		//Iterate over the results
-		for(PercolateResponse.Match match : response) {
-		    //Handle the result which is the name of
-		    //the query in the percolator
-			Text index = match.getIndex();
-			Text id = match.getId();
-			System.out.println(index);
-			System.out.println(id);
-			System.out.println("has match");
+//		docBuilder.endObject(); //End of the JSON root object
+//		//Percolate
+//		PercolateResponse response = client.preparePercolate()
+//		                        .setIndices("aaindex")
+//		                        .setDocumentType("mytype")
+//		                        .setSource(docBuilder).execute().actionGet();
+//		//Iterate over the results
+//		for(PercolateResponse.Match match : response) {
+//		    //Handle the result which is the name of
+//		    //the query in the percolator
+//			Text index = match.getIndex();
+//			Text id = match.getId();
+//			System.out.println(index);
+//			System.out.println(id);
+//			System.out.println("has match");
 		}
 		//System.out.println("not match");
-	}
+//	}
 }
