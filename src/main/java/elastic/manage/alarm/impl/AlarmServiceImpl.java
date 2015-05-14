@@ -18,6 +18,7 @@ import org.elasticsearch.search.SearchHits;
 
 import elastic.bean.CpuObject;
 import elastic.bean.ElasticObject;
+import elastic.bean.ElasticQuery;
 import elastic.manage.alarm.AlarmService;
 
 public class AlarmServiceImpl implements AlarmService
@@ -37,24 +38,46 @@ public class AlarmServiceImpl implements AlarmService
 	}
 	
 	
-	public List<CpuObject> getDataFromElatic(ElasticObject object) throws Exception
+	public List<CpuObject> getDataFromElatic(ElasticQuery object) throws Exception
 	{
 		if (null == object || StringUtils.isEmpty(object.getIndex())
-				|| StringUtils.isEmpty(object.getType())|| StringUtils.isEmpty(object.getHostname()))
+				|| StringUtils.isEmpty(object.getType()))
 		{
 			throw new Exception("参数不能为空");
 		}
-		SearchResponse actionGet = client
-				.prepareSearch(object.getIndex())
-				// 索引号
-				.setTypes(object.getType())
-				// 类型
-				.setQuery(
-						QueryBuilders.boolQuery().must(
-								QueryBuilders.termQuery("hostname",
-										object.getHostname()))).execute()
-				.actionGet();
-
+		SearchResponse actionGet;
+		/*判断hostname是否为空*/
+		if (!object.getHostname().isEmpty())
+		{
+					 actionGet = client
+					.prepareSearch(object.getIndex())
+					.setTypes(object.getType())
+					.setQuery(
+							QueryBuilders
+									.boolQuery()
+									.must(QueryBuilders.termQuery("hostname",
+											object.getHostname()))
+									.must(QueryBuilders.rangeQuery("@timestamp")
+											.from(object.getFrom_time())
+											.to(object.getTo_time())))
+											.execute()
+											.actionGet();
+		}
+		else
+		{
+					actionGet = client
+					.prepareSearch(object.getIndex())
+					.setTypes(object.getType())
+					.setQuery(
+							QueryBuilders
+									.boolQuery()
+									.must(QueryBuilders.rangeQuery("@timestamp")
+											.from(object.getFrom_time())
+											.to(object.getTo_time())))
+											.execute()
+											.actionGet();
+		}
+		
 		SearchHits hits = actionGet.getHits();
 		// List<Map<String, Object>> matchRsult = new LinkedList<Map<String,
 		// Object>>();
@@ -76,7 +99,7 @@ public class AlarmServiceImpl implements AlarmService
 			tempCpuObject.setUser_PCT(user_PCT);
 			tempCpuObject.setUsed_PCT(used_PCT);
 			matchRsult.add(tempCpuObject);
-			//System.out.println("有数据出来");
+		//	System.out.println("有数据出来");
 		}
 		return matchRsult;
 	}
