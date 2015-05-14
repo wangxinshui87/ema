@@ -26,7 +26,7 @@ public class AlarmServiceImpl implements AlarmService
 	private String clusterName = "alarm"; // 索引名字
 	private String ipAddress = "172.16.8.152";
 	private Client client; // 节点
-	
+
 	public AlarmServiceImpl()
 	{
 		/* 设置以及建立节点 */
@@ -36,9 +36,9 @@ public class AlarmServiceImpl implements AlarmService
 				.addTransportAddress(new InetSocketTransportAddress(
 						this.ipAddress, 9300));
 	}
-	
-	
-	public List<CpuObject> getDataFromElatic(ElasticQuery object) throws Exception
+
+	public List<CpuObject> getDataFromElatic(ElasticQuery object)
+			throws Exception
 	{
 		if (null == object || StringUtils.isEmpty(object.getIndex())
 				|| StringUtils.isEmpty(object.getType()))
@@ -46,10 +46,10 @@ public class AlarmServiceImpl implements AlarmService
 			throw new Exception("参数不能为空");
 		}
 		SearchResponse actionGet;
-		/*判断hostname是否为空*/
+		/* 判断hostname是否为空 */
 		if (!object.getHostname().isEmpty())
 		{
-					 actionGet = client
+			actionGet = client
 					.prepareSearch(object.getIndex())
 					.setTypes(object.getType())
 					.setQuery(
@@ -57,27 +57,24 @@ public class AlarmServiceImpl implements AlarmService
 									.boolQuery()
 									.must(QueryBuilders.termQuery("hostname",
 											object.getHostname()))
-									.must(QueryBuilders.rangeQuery("@timestamp")
-											.from(object.getFrom_time())
-											.to(object.getTo_time())))
-											.execute()
-											.actionGet();
-		}
-		else
+									.must(QueryBuilders
+											.rangeQuery("@timestamp")
+											.from(object.getStartTime())
+											.to(object.getEndTime())))
+					.execute().actionGet();
+		} else
 		{
-					actionGet = client
+			actionGet = client
 					.prepareSearch(object.getIndex())
 					.setTypes(object.getType())
 					.setQuery(
-							QueryBuilders
-									.boolQuery()
-									.must(QueryBuilders.rangeQuery("@timestamp")
-											.from(object.getFrom_time())
-											.to(object.getTo_time())))
-											.execute()
-											.actionGet();
+							QueryBuilders.boolQuery().must(
+									QueryBuilders.rangeQuery("@timestamp")
+											.from(object.getStartTime())
+											.to(object.getEndTime())))
+					.execute().actionGet();
 		}
-		
+
 		SearchHits hits = actionGet.getHits();
 		// List<Map<String, Object>> matchRsult = new LinkedList<Map<String,
 		// Object>>();
@@ -99,14 +96,14 @@ public class AlarmServiceImpl implements AlarmService
 			tempCpuObject.setUser_PCT(user_PCT);
 			tempCpuObject.setUsed_PCT(used_PCT);
 			matchRsult.add(tempCpuObject);
-		//	System.out.println("有数据出来");
+			// System.out.println("有数据出来");
 		}
 		return matchRsult;
 	}
 
 	public void saveAlarmData(CpuObject cpuobject) throws Exception
 	{
-		if (null == cpuobject || (cpuobject.getHitList().size() == 0 ))
+		if (null == cpuobject || (cpuobject.getHitList().size() == 0))
 		{
 			try
 			{
@@ -117,19 +114,19 @@ public class AlarmServiceImpl implements AlarmService
 				e.printStackTrace();
 			}
 		}
-		IndexResponse response = client.prepareIndex("aaa", "cpu")
-				.setSource(XContentFactory.jsonBuilder()
-				.startObject()
-					.field("Wait_PCT", cpuobject.getWait_PCT())
-					.field("Sys_PCT", cpuobject.getSys_PCT())
-					.field("User_PCT", cpuobject.getUser_PCT())
-					.field("Used_PCT", cpuobject.getUsed_PCT())
-					.field("index",cpuobject.getIndex())
-					.field("ID",cpuobject.getHitList())
-				.endObject())
-				.setTTL(8000)
-				.execute().actionGet();
-		
+		IndexResponse response = client
+				.prepareIndex("alarms", "cpu")
+				.setSource(
+						XContentFactory.jsonBuilder().startObject()
+								.field("Wait_PCT", cpuobject.getWait_PCT())
+								.field("Sys_PCT", cpuobject.getSys_PCT())
+								.field("User_PCT", cpuobject.getUser_PCT())
+								.field("Used_PCT", cpuobject.getUsed_PCT())
+								.field("index", cpuobject.getIndex())
+								.field("ID", cpuobject.getHitList())
+								.endObject()).setTTL(8000).execute()
+				.actionGet();
+
 	}
 
 }

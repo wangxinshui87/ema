@@ -1,6 +1,5 @@
 package elastic.bean;
 
-import java.util.Date;
 
 /**
  * 查询条件类
@@ -11,11 +10,11 @@ import java.util.Date;
  */
 public class ElasticQuery
 {
-	private String hostname = null;
-	private String type = null;
-	private String index = null;
-	private long from_time = 0;
-	private long to_time  = 0;
+	private String hostname;
+	private String type;
+	private String index;
+	private long startTime;
+	private long endTime;
 	public String getHostname()
 	{
 		return hostname;
@@ -40,21 +39,21 @@ public class ElasticQuery
 	{
 		this.index = index;
 	}
-	public long getFrom_time()
+	public long getStartTime()
 	{
-		return from_time;
+		return startTime;
 	}
-	public void setFrom_time(long from_time)
+	public void setStartTime(long startTime)
 	{
-		this.from_time = from_time;
+		this.startTime = startTime;
 	}
-	public long getTo_time()
+	public long getEndTime()
 	{
-		return to_time;
+		return endTime;
 	}
-	public void setTo_time(long to_time)
+	public void setEndTime(long endTime)
 	{
-		this.to_time = to_time;
+		this.endTime = endTime;
 	}
-	
+
 }

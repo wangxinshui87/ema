@@ -13,7 +13,7 @@ import elastic.bean.ElasticQuery;
 import elastic.bean.Threshold;
 import elastic.manage.alarm.AlarmService;
 import elastic.manage.alarm.impl.AlarmServiceImpl;
-import elastic.manage.percolator.PercolateCpuObject;
+import elastic.manage.percolator.PercolateCpuObjectImpl;
 
 public class DataPercalator 
 {
@@ -21,9 +21,5 @@ public class DataPercalator
 	{
 		Timer timer = new Timer();
 		timer.schedule(new Task(), 1, 10*1000);
-		while(true)
-		{
-		}
-		
 	}
 }

@@ -8,12 +8,12 @@ import elastic.bean.CpuObject;
 import elastic.bean.ElasticQuery;
 import elastic.manage.alarm.AlarmService;
 import elastic.manage.alarm.impl.AlarmServiceImpl;
-import elastic.manage.percolator.PercolateCpuObject;
+import elastic.manage.percolator.PercolateCpuObjectImpl;
 
 public class Task extends TimerTask
 {
 	private ElasticQuery object;
-	private boolean isfirstQuery = true;
+	private boolean isFirstQuery = true;
 	private Date date;
 	
 	/*构造函数设置查询基本条件*/
@@ -24,21 +24,21 @@ public class Task extends TimerTask
 		object.setHostname("hca1");
 		object.setIndex("cpu_all_index-2015.05");
 		object.setType("CPU_ALL");
-		object.setTo_time(date.getTime());
-		object.setFrom_time(date.getTime() - 10*6000);
+		object.setEndTime(date.getTime());
+		object.setStartTime(date.getTime() - 10*6000);
 	}
 	public void run()
 	{
 		AlarmService alarmService = new AlarmServiceImpl();  //用于获取和存储数据
-		PercolateCpuObject percolateCpuObject = new PercolateCpuObject(); //用于解析过滤数据
+		PercolateCpuObjectImpl percolateCpuObject = new PercolateCpuObjectImpl(); //用于解析过滤数据
 		
 		/*第一次查询不用设置时间*/
-		if(!isfirstQuery)
+		if(!isFirstQuery)
 		{
-			object.setFrom_time(object.getTo_time()); //当前查询开始时间为  为上一次查询的时间
-			object.setTo_time(date.getTime());   //查询结束时间为当前时间
+			object.setStartTime(object.getEndTime()); //当前查询开始时间为  为上一次查询的时间
+			object.setEndTime(date.getTime());   //查询结束时间为当前时间
 		}
-		isfirstQuery = false;
+		isFirstQuery = false;
 		List<CpuObject> cpuObjects;
 		try
 		{

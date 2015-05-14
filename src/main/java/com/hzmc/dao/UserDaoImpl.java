@@ -4,9 +4,6 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.text.DefaultEditorKit.InsertBreakAction;
-
-import com.hzmc.dataoperate.DeleteSqlExcutor;
 import com.hzmc.dataoperate.ExcuteSql;
 import com.hzmc.dataoperate.InsertSqlExcutor;
 import com.hzmc.dataoperate.SelectSqlExcutor;
@@ -15,8 +12,6 @@ import com.hzmc.dataoperate.UpdateSqlExcutor;
 
 public class UserDaoImpl implements UserDao
 {
-	private static int userId = 0;
-
 	public User addUser(User user) 
 	{
 		try
