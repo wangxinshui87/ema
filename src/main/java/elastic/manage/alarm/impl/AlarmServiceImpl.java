@@ -47,7 +47,7 @@ public class AlarmServiceImpl implements AlarmService
 		}
 		SearchResponse actionGet;
 		/* 判断hostname是否为空 */
-		if (!object.getHostname().isEmpty())
+		if (object.getHostname() != null )
 		{
 			actionGet = client
 					.prepareSearch(object.getIndex())
@@ -62,8 +62,10 @@ public class AlarmServiceImpl implements AlarmService
 											.from(object.getStartTime())
 											.to(object.getEndTime())))
 					.execute().actionGet();
-		} else
+		}
+		else
 		{
+			//System.out.println("in no hostname");
 			actionGet = client
 					.prepareSearch(object.getIndex())
 					.setTypes(object.getType())
@@ -88,15 +90,17 @@ public class AlarmServiceImpl implements AlarmService
 			double sys_PCT = (Double) hit.getSource().get("Sys_PCT");
 			double user_PCT = (Double) hit.getSource().get("User_PCT");
 			double used_PCT = wait_PCT + sys_PCT + user_PCT;
+		//	System.out.println(used_PCT);
 			/* 设置返回消息 */
 			tempCpuObject.setIndex(object.getIndex());
-			tempCpuObject.setHostname(object.getHostname());
-			tempCpuObject.setSys_PCT(sys_PCT);
-			tempCpuObject.setWait_PCT(wait_PCT);
-			tempCpuObject.setUser_PCT(user_PCT);
-			tempCpuObject.setUsed_PCT(used_PCT);
+			tempCpuObject.setHostname(hostname);
+			tempCpuObject.setSysPct(sys_PCT);
+			tempCpuObject.setWaitPct(wait_PCT);
+			tempCpuObject.setUserPct(user_PCT);
+			tempCpuObject.setUsedPct(used_PCT);
 			matchRsult.add(tempCpuObject);
-			// System.out.println("有数据出来");
+		//	System.out.println("有数据出来");
+		//	System.out.println(hostname);
 		}
 		return matchRsult;
 	}
@@ -114,16 +118,18 @@ public class AlarmServiceImpl implements AlarmService
 				e.printStackTrace();
 			}
 		}
+		//System.out.println("开始存储数据");
 		IndexResponse response = client
 				.prepareIndex("alarms", "cpu")
 				.setSource(
 						XContentFactory.jsonBuilder().startObject()
-								.field("Wait_PCT", cpuobject.getWait_PCT())
-								.field("Sys_PCT", cpuobject.getSys_PCT())
-								.field("User_PCT", cpuobject.getUser_PCT())
-								.field("Used_PCT", cpuobject.getUsed_PCT())
+								.field("Wait_PCT", cpuobject.getWaitPct())
+								.field("Sys_PCT", cpuobject.getSysPct())
+								.field("User_PCT", cpuobject.getUserPct())
+								.field("Used_PCT", cpuobject.getUsedPct())
 								.field("index", cpuobject.getIndex())
-								.field("ID", cpuobject.getHitList())
+								.field("athresholdIds", cpuobject.getHitList())
+								.field("hostname", cpuobject.getHostname())
 								.endObject()).setTTL(8000).execute()
 				.actionGet();
 

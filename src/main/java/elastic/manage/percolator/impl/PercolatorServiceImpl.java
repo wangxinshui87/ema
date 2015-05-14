@@ -1,4 +1,4 @@
-package elastic.manage.percolator;
+package elastic.manage.percolator.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,15 +13,17 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 
 import elastic.bean.CpuObject;
+import elastic.bean.ElasticObject;
 import elastic.bean.Threshold;
+import elastic.manage.percolator.PercolatorService;
 
-public class PercolateCpuObjectImpl implements PercolatorService
+public class PercolatorServiceImpl implements PercolatorService
 {
 	private String clusterName = "alarm"; // 索引名字
 	private String ipAddress = "172.16.8.152";
 	private Client client; // 节点
 
-	public PercolateCpuObjectImpl()
+	public PercolatorServiceImpl()
 	{
 		/* 设置以及建立节点 */
 		Builder settings = ImmutableSettings.settingsBuilder().put(
@@ -31,12 +33,13 @@ public class PercolateCpuObjectImpl implements PercolatorService
 						this.ipAddress, 9300));
 	}
 	//Build a document to check against the percolator
-	public List<String> doPercolateWithCpuObject(CpuObject cpuObject) throws Exception
+	public List<String> doPercolatorService(ElasticObject elasticObject) throws Exception
 	{
+		CpuObject cpuObject = (CpuObject)elasticObject;
 		/*Build a document to check against the percolator*/
 		XContentBuilder doBuilder = XContentFactory.jsonBuilder().startObject();
 		doBuilder.field("doc").startObject();
-		doBuilder.field("Used_PCT",cpuObject.getUsed_PCT());
+		doBuilder.field("Used_PCT",cpuObject.getUsedPct());
 		doBuilder.endObject();
 	//	System.out.println("IN TEST" + cpuObject.getUsed_PCT() + cpuObject.getIndex());
 		/*Percolate*/
@@ -55,7 +58,7 @@ public class PercolateCpuObjectImpl implements PercolatorService
 			tempThreshold.setId(match.getId());
 			tempThreshold.setIndex(match.getIndex());
 			hitList.add(tempThreshold.getId().toString());
-	//		System.out.println("has match");
+		//	System.out.println("has match");
 		}
 		return hitList;
 	}

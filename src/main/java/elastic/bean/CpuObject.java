@@ -4,42 +4,42 @@ import java.util.List;
 
 public class CpuObject extends ElasticObject
 {
-	private double Wait_PCT;
-	private double Sys_PCT;
-	private double User_PCT;
-	private double Used_PCT;
+	private double waitPct;
+	private double sysPct;
+	private double userPct;
+	private double usedPct;
 	private List<String> hitList;
-	public double getWait_PCT()
+	public double getWaitPct()
 	{
-		return Wait_PCT;
+		return waitPct;
 	}
-	public void setWait_PCT(double wait_PCT)
+	public void setWaitPct(double waitPct)
 	{
-		Wait_PCT = wait_PCT;
+		this.waitPct = waitPct;
 	}
-	public double getSys_PCT()
+	public double getSysPct()
 	{
-		return Sys_PCT;
+		return sysPct;
 	}
-	public void setSys_PCT(double sys_PCT)
+	public void setSysPct(double sysPct)
 	{
-		Sys_PCT = sys_PCT;
+		this.sysPct = sysPct;
 	}
-	public double getUser_PCT()
+	public double getUserPct()
 	{
-		return User_PCT;
+		return userPct;
 	}
-	public void setUser_PCT(double user_PCT)
+	public void setUserPct(double userPct)
 	{
-		User_PCT = user_PCT;
+		this.userPct = userPct;
 	}
-	public double getUsed_PCT()
+	public double getUsedPct()
 	{
-		return Used_PCT;
+		return usedPct;
 	}
-	public void setUsed_PCT(double used_PCT)
+	public void setUsedPct(double usedPct)
 	{
-		Used_PCT = used_PCT;
+		this.usedPct = usedPct;
 	}
 	public List<String> getHitList()
 	{
@@ -49,6 +49,5 @@ public class CpuObject extends ElasticObject
 	{
 		this.hitList = hitList;
 	}
-	
 	
 }

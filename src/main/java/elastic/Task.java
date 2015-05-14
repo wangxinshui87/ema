@@ -8,7 +8,8 @@ import elastic.bean.CpuObject;
 import elastic.bean.ElasticQuery;
 import elastic.manage.alarm.AlarmService;
 import elastic.manage.alarm.impl.AlarmServiceImpl;
-import elastic.manage.percolator.PercolateCpuObjectImpl;
+import elastic.manage.percolator.PercolatorService;
+import elastic.manage.percolator.impl.PercolatorServiceImpl;
 
 public class Task extends TimerTask
 {
@@ -21,7 +22,7 @@ public class Task extends TimerTask
 	{
 		date = new Date();
 		object = new ElasticQuery();
-		object.setHostname("hca1");
+		//object.setHostname("hca1");
 		object.setIndex("cpu_all_index-2015.05");
 		object.setType("CPU_ALL");
 		object.setEndTime(date.getTime());
@@ -30,7 +31,7 @@ public class Task extends TimerTask
 	public void run()
 	{
 		AlarmService alarmService = new AlarmServiceImpl();  //用于获取和存储数据
-		PercolateCpuObjectImpl percolateCpuObject = new PercolateCpuObjectImpl(); //用于解析过滤数据
+		PercolatorService percolateCpuObject = new PercolatorServiceImpl(); //用于解析过滤数据
 		
 		/*第一次查询不用设置时间*/
 		if(!isFirstQuery)
@@ -45,11 +46,12 @@ public class Task extends TimerTask
 			cpuObjects = alarmService.getDataFromElatic(object);
 			if(null != cpuObjects && !cpuObjects.isEmpty())
 			{
+				//System.out.println("开始过滤");
 				for (CpuObject cpuObject : cpuObjects)
 				{
-					//System.out.println(cpuObject.getUsed_PCT());		
-					cpuObject.setHitList(percolateCpuObject.doPercolateWithCpuObject(cpuObject));
-					System.out.println(cpuObject.getHitList());
+					//System.out.println(cpuObject.getUsedPct());		
+					cpuObject.setHitList(percolateCpuObject.doPercolatorService(cpuObject));
+				//	System.out.println(cpuObject.getHitList());
 					if (!cpuObject.getHitList().isEmpty())
 					{
 							alarmService.saveAlarmData(cpuObject);
