@@ -1,6 +1,7 @@
 package elastic.manage.alarm.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.elasticsearch.action.index.IndexResponse;
@@ -90,6 +91,9 @@ public class AlarmServiceImpl implements AlarmService
 			double sys_PCT = (Double) hit.getSource().get("Sys_PCT");
 			double user_PCT = (Double) hit.getSource().get("User_PCT");
 			double used_PCT = wait_PCT + sys_PCT + user_PCT;
+			String ZZZZ = (String) hit.getSource().get("ZZZZ");
+			Date timestamp = (Date) hit.getSource().get("@timestamp");
+			
 		//	System.out.println(used_PCT);
 			/* 设置返回消息 */
 			tempCpuObject.setIndex(object.getIndex());
@@ -98,6 +102,7 @@ public class AlarmServiceImpl implements AlarmService
 			tempCpuObject.setWaitPct(wait_PCT);
 			tempCpuObject.setUserPct(user_PCT);
 			tempCpuObject.setUsedPct(used_PCT);
+			tempCpuObject.setZZZZ(ZZZZ);
 			matchRsult.add(tempCpuObject);
 		//	System.out.println("有数据出来");
 		//	System.out.println(hostname);
@@ -130,6 +135,8 @@ public class AlarmServiceImpl implements AlarmService
 								.field("index", cpuobject.getIndex())
 								.field("athresholdIds", cpuobject.getHitList())
 								.field("hostname", cpuobject.getHostname())
+								.field("ZZZZ",cpuobject.getZZZZ())
+								.field("@timestamp",cpuobject.getTimestamp())
 								.endObject()).setTTL(8000).execute()
 				.actionGet();
 

@@ -5,11 +5,28 @@ import java.util.Date;
 public class ElasticObject
 {
 	private String hostname;
-	private Date createTime;
+	private Date timestamp;
 	private String type;
 	private String index;
+	private String ZZZZ;
 	
 	
+	public Date getTimestamp()
+	{
+		return timestamp;
+	}
+	public void setTimestamp(Date timestamp)
+	{
+		this.timestamp = timestamp;
+	}
+	public String getZZZZ()
+	{
+		return ZZZZ;
+	}
+	public void setZZZZ(String zZZZ)
+	{
+		ZZZZ = zZZZ;
+	}
 	public String getHostname()
 	{
 		return hostname;
@@ -18,14 +35,7 @@ public class ElasticObject
 	{
 		this.hostname = hostname;
 	}
-	public Date getCreateTime()
-	{
-		return createTime;
-	}
-	public void setCreateTime(Date createTime)
-	{
-		this.createTime = createTime;
-	}
+	
 	public String getType()
 	{
 		return type;
